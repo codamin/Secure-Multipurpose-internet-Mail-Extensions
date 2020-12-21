@@ -1,14 +1,15 @@
 
 
 ### Extracting Alice's public-key From Alice's certificate file using openssl x509:
->>> openssl x509 -pubkey -noout -in netsecf99@outlook_com.crt  > Alice-pubkey.pem
+### -inform der indicates that the input is in der format not pem
+>>> openssl x509 -pubkey -noout -inform DER -in netsecf99@outlook_com.cer  > Alice-pubkey.pem
 
 ### Dycrypting "message1" with symmetric-key="key1.bin"
 ### des-ecb indicates the encryption method
 >>> openssl des-ecb -d -pass file:key1.bin -in message1.enc -out message2.txt
 
 1### Generating a 32-byte symmetric key:key2.bin
-### openssl rand -base64 32 > key2.bin
+>>> openssl rand -base64 32 > key2.bin
 
 ### Encrypting the symmetric-key="key2.bin" with Alice's public-key="Alice-pubkey.pem"
 ### rsa indecates the encryption method:RSA
