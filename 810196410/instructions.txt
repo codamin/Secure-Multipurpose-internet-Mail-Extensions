@@ -1,0 +1,33 @@
+
+
+### Extracting Alice's public-key From Alice's certificate file using openssl x509:
+>>> openssl x509 -pubkey -noout -in netsecf99@outlook_com.crt  > Alice-pubkey.pem
+
+### Dycrypting "message1" with symmetric-key="key1.bin"
+### des-ecb indicates the encryption method
+>>> openssl des-ecb -d -pass file:key1.bin -in message1.enc -out message2.txt
+
+1### Generating a 32-byte symmetric key:key2.bin
+### openssl rand -base64 32 > key2.bin
+
+### Encrypting the symmetric-key="key2.bin" with Alice's public-key="Alice-pubkey.pem"
+### rsa indecates the encryption method:RSA
+>>> openssl rsautl -encrypt -pubin -inkey Alice-pubkey.pem -in key2.bin -out key2.bin.enc
+
+2### Encrypting message2.txt(completed message.txt) with key2.bin
+### des-ofb indicates the encryption method
+>>> openssl des-ofb -e -pass file:key2.bin -in message2.txt -out message2.enc
+
+3### Extracting Bob's private-key from .pfx file.
+### The output of the conversion command is piped to the second command which removes the passphrase from it
+### bob_cert.password is contains Bob's certificate-file password
+>>> openssl pkcs12 -in PKCS12_Credential_look.aminasadi@outlook.com.pfx -nocerts -nodes -passin file:bob_cert.password | openssl rsa -out bob_private.key
+
+### Siging message2.txt with Bob's private key
+### sha512 indicates the digestion algorithm
+>>> openssl dgst -sha512 -sign bob_private.key -out message2.sign.sha512 message2.txt
+
+4### Extracting Bob's certificate from .pfx file.
+### The output of the conversion command is piped to the second command to extract corresponding public-key
+### bob_cert.password is contains Bob's certificate-file password
+>>> openssl pkcs12 -in PKCS12_Credential_look.aminasadi@outlook.com.pfx -nocerts -nodes -passin file:bob_cert.password | openssl rsa -pubout -out bob_public.pem
